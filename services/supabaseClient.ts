@@ -5,14 +5,14 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error(
-    '❌ Missing Supabase configuration!\n' +
-    'Please create a .env file with:\n' +
-    '  VITE_SUPABASE_URL=your-project-url\n' +
-    '  VITE_SUPABASE_ANON_KEY=your-anon-key\n' +
-    'See .env.example for details.'
+  console.warn(
+    '⚠️ Missing Supabase configuration! App will not function correctly.\n' +
+    'Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.'
   );
-  throw new Error('Supabase configuration is required. Check console for details.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// Use fallbacks to prevent crash, but requests will fail
+const url = supabaseUrl || 'https://placeholder.supabase.co';
+const key = supabaseKey || 'placeholder';
+
+export const supabase = createClient(url, key);
