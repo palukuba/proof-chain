@@ -9,19 +9,21 @@ import { GraduationCap, Mail, Lock, Building2, Globe } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ROUTES } from '../constants';
 
+import { isSupabaseConfigured } from '../services/supabaseClient';
+
 export const Login: React.FC = () => {
   const { login, register, isLoading, isAuthenticated } = useAuth();
   const { t } = useTranslation();
-  
+
   // Form States
   const [activeTab, setActiveTab] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // Registration specific states
   const [institutionName, setInstitutionName] = useState('');
   const [website, setWebsite] = useState('');
-  
+
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -68,6 +70,15 @@ export const Login: React.FC = () => {
           <CardTitle className="text-2xl font-bold">{t('app.name')}</CardTitle>
         </CardHeader>
         <CardContent>
+          {!isSupabaseConfigured && (
+            <div className="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-200">
+              <p className="font-bold">⚠️ Configuration Manquante</p>
+              <p className="text-sm">
+                L'application n'est pas connectée à Supabase.
+                Veuillez configurer les variables d'environnement VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY sur Vercel.
+              </p>
+            </div>
+          )}
           <Tabs defaultValue="login" onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">{t('auth.tab_login')}</TabsTrigger>
@@ -114,7 +125,7 @@ export const Login: React.FC = () => {
                     />
                   </div>
                 </div>
-                
+
                 <Button type="submit" className="w-full mt-2" isLoading={isLoading}>
                   {t('auth.submit_login')}
                 </Button>
@@ -124,28 +135,28 @@ export const Login: React.FC = () => {
             <TabsContent value="register">
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
-                    <div className="relative">
-                      <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        className="pl-9"
-                        placeholder={t('auth.institution_name')}
-                        value={institutionName}
-                        onChange={(e) => setInstitutionName(e.target.value)}
-                        required
-                      />
-                    </div>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      className="pl-9"
+                      placeholder={t('auth.institution_name')}
+                      value={institutionName}
+                      onChange={(e) => setInstitutionName(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        className="pl-9"
-                        placeholder={t('auth.website')}
-                        value={website}
-                        onChange={(e) => setWebsite(e.target.value)}
-                      />
-                    </div>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      className="pl-9"
+                      placeholder={t('auth.website')}
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -183,7 +194,7 @@ export const Login: React.FC = () => {
               </form>
             </TabsContent>
           </Tabs>
-          
+
           <p className="text-xs text-muted-foreground text-center mt-6">
             {t('auth.helper')}
           </p>
