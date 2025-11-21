@@ -36,6 +36,7 @@ export interface AcademicDocument {
   assetName?: string;
   status: DocumentStatus;
   description?: string;
+  fileUrl?: string;
 }
 
 export interface SchoolProfile {

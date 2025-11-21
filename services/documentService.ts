@@ -2,6 +2,27 @@ import { supabase } from './supabaseClient';
 import { AcademicDocument, DocumentStatus } from '../types';
 
 export const documentService = {
+  async uploadDocument(file: File): Promise<string> {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading file:', uploadError);
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('documents')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  },
+
   async getAllDocuments(): Promise<AcademicDocument[]> {
     try {
       const { data, error } = await supabase
@@ -43,7 +64,8 @@ export const documentService = {
       student_name: doc.studentName,
       issue_date: doc.issueDate,
       description: doc.description,
-      status: DocumentStatus.DRAFT
+      status: DocumentStatus.DRAFT,
+      file_url: doc.fileUrl
     };
 
     const { data, error } = await supabase
@@ -64,7 +86,8 @@ export const documentService = {
       studentName: data.student_name,
       issueDate: data.issue_date,
       status: data.status,
-      description: data.description
+      description: data.description,
+      fileUrl: data.file_url
     };
   },
 

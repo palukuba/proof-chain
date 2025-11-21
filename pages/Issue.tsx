@@ -11,6 +11,7 @@ export const Issue: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     studentName: '',
@@ -23,10 +24,21 @@ export const Issue: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await documentService.createDocument(formData);
+      let fileUrl = undefined;
+
+      if (file) {
+        fileUrl = await documentService.uploadDocument(file);
+      }
+
+      await documentService.createDocument({
+        ...formData,
+        fileUrl
+      });
+
       navigate(ROUTES.DOCUMENTS);
     } catch (error) {
       console.error(error);
+      alert('Error creating document. Check console.');
     } finally {
       setLoading(false);
     }
@@ -45,46 +57,57 @@ export const Issue: React.FC = () => {
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">{t('doc.title')}</label>
-                <Input 
-                  value={formData.title} 
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  required 
+                <Input
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">{t('doc.student')}</label>
-                <Input 
-                  placeholder="Student Name" 
+                <Input
+                  placeholder="Student Name"
                   value={formData.studentName}
-                  onChange={(e) => setFormData({...formData, studentName: e.target.value})}
-                  required 
+                  onChange={(e) => setFormData({ ...formData, studentName: e.target.value })}
+                  required
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">Student ID</label>
-                <Input 
-                  placeholder="ID12345" 
+                <Input
+                  placeholder="ID12345"
                   value={formData.studentId}
-                  onChange={(e) => setFormData({...formData, studentId: e.target.value})}
-                  required 
+                  onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+                  required
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium leading-none">{t('doc.date')}</label>
-                <Input 
-                  type="date" 
+                <Input
+                  type="date"
                   value={formData.issueDate}
-                  onChange={(e) => setFormData({...formData, issueDate: e.target.value})}
-                  required 
+                  onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+                  required
                 />
               </div>
 
-               <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">{t('doc.upload')} (PDF)</label>
-                <Input type="file" accept=".pdf" />
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">{t('doc.upload')} (PDF, JPG, PNG)</label>
+                <Input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setFile(e.target.files[0]);
+                    }
+                  }}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Formats acceptés: PDF, JPG, PNG.
+                </p>
               </div>
             </div>
 
